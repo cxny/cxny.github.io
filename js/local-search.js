@@ -13,7 +13,7 @@ window.addEventListener('DOMContentLoaded', () => {
     isXml = false;
   }
   const path = CONFIG.root + searchPath;
-  const input = document.querySelector('.search-input');
+  const input = document.getElementById('search-input');
   const resultContent = document.getElementById('search-result');
 
   // Ref: https://github.com/ForbesLindesay/unescape-html
@@ -54,7 +54,8 @@ window.addEventListener('DOMContentLoaded', () => {
   // Merge hits into slices
   const mergeIntoSlice = (start, end, index, searchText) => {
     let item = index[index.length - 1];
-    let { position, word } = item;
+    let position = item.position;
+    let word = item.word;
     let hits = [];
     let searchTextCountInSlice = 0;
     while (position + word.length <= end && index.length !== 0) {
@@ -81,9 +82,9 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     }
     return {
-      hits,
-      start,
-      end,
+      hits           : hits,
+      start          : start,
+      end            : end,
       searchTextCount: searchTextCountInSlice
     };
   };
@@ -153,7 +154,8 @@ window.addEventListener('DOMContentLoaded', () => {
           let slicesOfContent = [];
           while (indexOfContent.length !== 0) {
             let item = indexOfContent[indexOfContent.length - 1];
-            let { position, word } = item;
+            let position = item.position;
+            let word = item.word;
             // Cut out 100 characters
             let start = position - 20;
             let end = position + 80;
@@ -264,7 +266,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = 'hidden';
     document.querySelector('.search-pop-overlay').style.display = 'block';
     document.querySelector('.popup').style.display = 'block';
-    document.querySelector('.search-input').focus();
+    document.getElementById('search-input').focus();
   };
 
   // Search function
@@ -279,17 +281,19 @@ window.addEventListener('DOMContentLoaded', () => {
   } else {
     document.querySelector('.search-icon').addEventListener('click', inputEventFunction);
     input.addEventListener('keypress', event => {
-      if (event.key === 'Enter') {
+      if (event.keyCode === 13) {
         inputEventFunction();
       }
     });
   }
 
   // Handle and trigger popup window
-  document.querySelectorAll('.popup-trigger').forEach(element => {
-    element.addEventListener('click', () => {
-      isfetched ? proceedSearch() : searchFunc();
-    });
+  document.querySelector('.popup-trigger').addEventListener('click', () => {
+    if (isfetched === false) {
+      searchFunc();
+    } else {
+      proceedSearch();
+    }
   });
 
   // Monitor main search box
@@ -303,7 +307,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.querySelector('.popup-btn-close').addEventListener('click', onPopupClose);
   window.addEventListener('pjax:success', onPopupClose);
   window.addEventListener('keyup', event => {
-    if (event.key === 'Escape') {
+    if (event.which === 27) {
       onPopupClose();
     }
   });
